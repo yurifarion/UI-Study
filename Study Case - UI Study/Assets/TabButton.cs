@@ -4,13 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Image))]
 public class TabButton : MonoBehaviour, IPointerEnterHandler,IPointerClickHandler,IPointerExitHandler
 {
     public TabGroup tabGroup;
     private TextMeshProUGUI childText ;
-    
+
+    public UnityEvent onTabSelected;
+    public UnityEvent onTabDeselected;
     public void Start()
     {
         childText = this.gameObject.transform.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>();
@@ -38,6 +41,20 @@ public class TabButton : MonoBehaviour, IPointerEnterHandler,IPointerClickHandle
         return childText;
     }
 
+    public void Select()
+    {
+        if(onTabSelected != null)
+        {
+            onTabSelected.Invoke();
+        }
+    }
+    public void Deselect()
+    {
+        if (onTabDeselected != null)
+        {
+            onTabDeselected.Invoke();
+        }
+    }
     // Update is called once per frame
     void Update()
     {

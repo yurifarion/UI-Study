@@ -13,6 +13,8 @@ public class TabGroup : MonoBehaviour
 
     public TabButton selectedButton;
 
+    public List<GameObject> objectsToSwap;
+
     public PanelGroup panelGroup;
 
     //public PanelGroup panelGroup;
@@ -38,6 +40,10 @@ public class TabGroup : MonoBehaviour
     }
     public void OnTabSelected(TabButton button)
     {
+        if(selectedButton != null)
+        {
+            selectedButton.Deselect();
+        }
         Debug.Log("Selected");
         ResetTabs();
         button.GetComponent<Image>().color = tabActive[0];
@@ -45,6 +51,15 @@ public class TabGroup : MonoBehaviour
 
         if (selectedButton == null || button != selectedButton)
             selectedButton = button;
+
+        selectedButton.Select();
+
+        int index = button.transform.GetSiblingIndex();
+
+       for(int i = 0; i < objectsToSwap.Count; ++i)
+        {
+            objectsToSwap[i].SetActive(i == index);
+        }
     }
     public void ResetTabs()
     {

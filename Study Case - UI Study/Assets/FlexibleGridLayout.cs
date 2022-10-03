@@ -9,7 +9,9 @@ public class FlexibleGridLayout : LayoutGroup
     {
         Uniform,
         Width,
-        Height
+        Height,
+        FixedRows,
+        FixedColumns
     }
     public FitType fitType;
     public int rows;
@@ -17,31 +19,40 @@ public class FlexibleGridLayout : LayoutGroup
     public Vector2 cellSize;
     public Vector2 spacing;
 
+    public bool fitX;
+    public bool fitY;
+
     public override void CalculateLayoutInputVertical()
     {
         base.CalculateLayoutInputHorizontal();
 
-        float sqrRt = Mathf.Sqrt(transform.childCount);
-        rows = Mathf.CeilToInt(sqrRt);
-        columns = Mathf.CeilToInt(sqrRt);
 
-        if(fitType == FitType.Width)
+        if(fitType == FitType.Width || fitType == FitType.Height || fitType == FitType.Uniform)
+        {
+            fitX = true;
+            fitY = true;
+            float sqrRt = Mathf.Sqrt(transform.childCount);
+            rows = Mathf.CeilToInt(sqrRt);
+            columns = Mathf.CeilToInt(sqrRt);
+        }
+        
+
+        if(fitType == FitType.Width || fitType == FitType.FixedColumns)
         {
             rows = Mathf.CeilToInt(transform.childCount / (float)columns);
         }
-        if (fitType == FitType.Height)
+        if (fitType == FitType.Height || fitType == FitType.FixedRows)
         {
             columns = Mathf.CeilToInt(transform.childCount / (float)rows);
         }
 
 
-        float parentWidth = rectTransform.rect.width;
-        float parentHeight = rectTransform.rect.height;
+        
+        float cellWidth = cellWidth = (this.rectTransform.rect.width / (float)columns) - ((spacing.x / (float)columns) * (columns - 1)) - (padding.left / (float)columns) - (padding.right / (float)columns);
+        float cellHeight = cellHeight = (this.rectTransform.rect.height / (float)rows) - ((spacing.y / (float)rows) * (rows - 1)) - (padding.top / (float)rows) - (padding.bottom / (float)rows);
 
-        float cellWidth = (parentWidth / (float)columns) - ((spacing.x / (float)columns) * 2) - (padding.left / (float)columns) - (padding.right / (float)columns);
-        float cellHeight = parentHeight / (float)rows - ((spacing.y / (float)rows) * 2) - (padding.top / (float)rows) - (padding.bottom / (float)rows);
-
-        cellSize = new Vector2(cellWidth, cellHeight);
+        cellSize.x = fitX ? (cellWidth <= 0 ? cellSize.x : cellWidth) : cellSize.x;
+        cellSize.y = fitY ? (cellHeight <= 0 ? cellSize.y : cellHeight) : cellSize.y;
 
         int columnCount = 0;
         int rowCount = 0;
